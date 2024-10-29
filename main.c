@@ -25,7 +25,7 @@ void	handle_resize(int32_t width, int32_t height, void *param)
 	if (!mlx_resize_image(img, width, height))
 		return ;
 	// hasta aquí solo se redimensiona la imagen,
-	// esto puede causar desproporciones
+	// esto causa desproporciones
 }
 
 void	draw(mlx_image_t *img)
@@ -46,6 +46,65 @@ void	draw(mlx_image_t *img)
 	}
 }
 
+int** convertir_a_int(char** arr_str, int filas) {
+    int** resultado = (int**)malloc(filas * sizeof(int*));
+    int i = 0;
+
+    while (i < filas) {
+        // Usa ft_split para dividir el string en números separados
+        char** tokens = ft_split(arr_str[i], ' ');
+
+        // Cuenta cuántos tokens hay
+        int cuenta = 0;
+        while (tokens[cuenta] != NULL) {
+            cuenta++;
+        }
+
+        // Reserva memoria para almacenar los enteros en resultado[i]
+        resultado[i] = (int*)malloc(cuenta * sizeof(int));
+
+        // Convierte cada token a un entero usando ft_atoi y verifica el resultado
+        int j = 0;
+        char checker = 'a';  // Inicia checker como válido
+        while (j < cuenta) {
+            resultado[i][j] = ft_atoi(tokens[j], &checker);
+            if (checker == 'b') {
+                printf("Error: Número inválido o desbordamiento detectado en la fila %d, columna %d\n", i, j);
+                resultado[i][j] = 0;  // Puedes manejar el error según lo que prefieras
+            }
+            free(tokens[j]);  // Libera cada token después de la conversión
+            j++;
+        }
+        free(tokens);          // Libera el array de tokens
+        free(arr_str[i]);      // Libera cada string de arr_str una vez procesado
+        i++;
+    }
+
+    free(arr_str);  // Libera el array de strings en sí
+    return resultado;
+}
+
+
+
+int	count_lines(int infile)
+{
+	int		count = 0;
+	char	buffer;
+	int		has_content = 0;
+
+	// Leer el archivo carácter por carácter
+	while (read(infile, &buffer, 1) > 0)
+	{
+		has_content = 1; // Indica que hay contenido en el archivo
+		if (buffer == '\n')
+			count++;
+	}
+	// Si hay contenido pero no terminó en un salto de línea, contar una línea extra
+	if (has_content && buffer != '\n')
+		count++;
+	return count;
+}
+
 int	main(int argc, char **argv)
 {
 	mlx_t			*mlx;
@@ -56,14 +115,38 @@ int	main(int argc, char **argv)
 	char			**lines;
 	int				i;
 	char			*current_line;
+	int			**matrix;
 
 
 	infile = open(argv[1], O_RDONLY, 0777);
-	while (get_next_line(infile)
+	if (infile < 0)
 	{
-		
+		perror("Error opening file");
+		return 1;
 	}
-	// Inicializar la ventana con MLX42 (temporal, luego redimensionamos si es necesario)
+	line_count = count_lines(infile);
+	clos(infile);
+	infile = open(argv[1], O_RDONLY, 0777); // se hace esto para redirigir el puntero al inicio
+	// Reservar memoria para el puntero de punteros con el tamaño exacto
+	lines = malloc(sizeof(char *) * (line_count + 1));
+	if (!lines)
+	{
+		perror("Error allocating memory");
+		close(infile);
+		return 1;
+	}
+	i = 0;
+	current_line = get_next_line(infile);
+	while (current_line != NULL)
+	{
+		lines[i] = current_line;
+		i++;
+		current_line = get_next_line(infile);
+	}
+	lines[i] = NULL;
+	close(infile);
+	matrix = make_matrix(lines);
+
 	mlx = mlx_init(1, 1, "fdf", true);
 	if (!mlx)
 		return (1);
