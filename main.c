@@ -61,9 +61,8 @@ int	main(int argc, char **argv)
 	infile = open(argv[1], O_RDONLY, 0777);
 	while (get_next_line(infile)
 	{
-		current_line 
+		
 	}
-
 	// Inicializar la ventana con MLX42 (temporal, luego redimensionamos si es necesario)
 	mlx = mlx_init(1, 1, "fdf", true);
 	if (!mlx)
@@ -73,10 +72,10 @@ int	main(int argc, char **argv)
 	mlx_get_monitor_size(0, &monitor_width, &monitor_height); // Monitor principal
 
 	// Redimensionar la ventana al tamaño máximo del monitor
-	mlx_set_window_size(mlx, monitor_width * 0.7, monitor_height * 0.6);
+	mlx_set_window_size(mlx, monitor_width, monitor_height);
 
 	// Crear la imagen con el tamaño de la ventana
-	img = mlx_new_image(mlx, monitor_width * 0.7, monitor_height * 0.6);
+	img = mlx_new_image(mlx, monitor_width, monitor_height);
 	if (!img)
 		return (1);
 
