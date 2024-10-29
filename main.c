@@ -1,5 +1,12 @@
 #include "MLX42.h"
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 void	handle_keypress(mlx_key_data_t keydata, void *param)
 {
@@ -21,13 +28,13 @@ void	handle_resize(int32_t width, int32_t height, void *param)
 	// esto puede causar desproporciones
 }
 
-void	draw_square(mlx_image_t *img)
+void	draw(mlx_image_t *img)
 {
 	int	i;
 	int	e;
 
 	i = 0;
-	while (i < 400)
+	while (i < 80)
 	{
 		e = 0;
 		while (e < 400)
@@ -39,15 +46,26 @@ void	draw_square(mlx_image_t *img)
 	}
 }
 
-int	main(void)
+int	main(int argc, char **argv)
 {
 	mlx_t			*mlx;
 	mlx_image_t		*img;
 	int				monitor_width;
 	int				monitor_height;
+	int				infile;
+	char			**lines;
+	int				i;
+	char			*current_line;
+
+
+	infile = open(argv[1], O_RDONLY, 0777);
+	while (get_next_line(infile)
+	{
+		current_line 
+	}
 
 	// Inicializar la ventana con MLX42 (temporal, luego redimensionamos si es necesario)
-	mlx = mlx_init(1, 1, "Ventana temporal", true);
+	mlx = mlx_init(1, 1, "fdf", true);
 	if (!mlx)
 		return (1);
 
@@ -55,15 +73,15 @@ int	main(void)
 	mlx_get_monitor_size(0, &monitor_width, &monitor_height); // Monitor principal
 
 	// Redimensionar la ventana al tamaño máximo del monitor
-	mlx_set_window_size(mlx, monitor_width, monitor_height);
+	mlx_set_window_size(mlx, monitor_width * 0.7, monitor_height * 0.6);
 
 	// Crear la imagen con el tamaño de la ventana
-	img = mlx_new_image(mlx, monitor_width, monitor_height);
+	img = mlx_new_image(mlx, monitor_width * 0.7, monitor_height * 0.6);
 	if (!img)
 		return (1);
 
-	draw_square(img);
-	mlx_image_to_window(mlx, img, 200, 200); // optimiza llamadas al hardware
+	draw(img);
+	mlx_image_to_window(mlx, img, 0, 0); // optimiza llamadas al hardware
 	// para imprimir píxeles, a la vez ayuda al renderizado para no imprimir uno a uno
 
 	mlx_key_hook(mlx, handle_keypress, mlx); // llama a handle_keypress
