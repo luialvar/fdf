@@ -24,12 +24,16 @@ void	draw_line(mlx_image_t *img, int x0, int y0, int x1, int y1, uint32_t color)
 
 void	clear_image(mlx_image_t *img)
 {
-	for (int y = 0; y < img->height; y++)
+	int y = 0;
+	while (y < img->height)
 	{
-		for (int x = 0; x < img->width; x++)
+		int x = 0;
+		while (x < img->width)
 		{
 			mlx_put_pixel(img, x, y, 0x00000000); // Color transparente
+			x++;
 		}
+		y++;
 	}
 }
 
