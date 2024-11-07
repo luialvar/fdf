@@ -6,12 +6,12 @@
 /*   By: luialvar <luialvar@student.42malaga.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 12:00:11 by luialvar          #+#    #+#             */
-/*   Updated: 2024/11/06 17:22:08 by luialvar         ###   ########.fr       */
+/*   Updated: 2024/11/07 17:20:44 by luialvar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-/*
+
 void	draw(mlx_image_t *img, int **matrix, int line_count, int* number_count)
 {
 	// Limpiar la imagen antes de redibujar
@@ -42,7 +42,7 @@ void	draw(mlx_image_t *img, int **matrix, int line_count, int* number_count)
 		}
 	}
 }
-*/
+
 int**	make_matrix(char** str_arr, int rows, int* count_numbers_line) 
 {
 	int**	result;
@@ -137,6 +137,7 @@ char	**read_file_lines(const char *filename, int *line_count)
 	close(infile);
 	return (lines);
 }
+/*
 int main(int argc, char **argv) {
     if (argc < 2) {
         fprintf(stderr, "Uso: %s <archivo>\n", argv[0]);
@@ -179,4 +180,4 @@ int main(int argc, char **argv) {
         printf("\n");
     }
     return 0;
-}
+}*/
