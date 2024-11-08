@@ -6,7 +6,7 @@
 /*   By: luialvar <luialvar@student.42malaga.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 12:00:11 by luialvar          #+#    #+#             */
-/*   Updated: 2024/11/07 17:20:44 by luialvar         ###   ########.fr       */
+/*   Updated: 2024/11/08 11:32:34 by luialvar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	draw(mlx_image_t *img, int **matrix, int line_count, int* number_count)
 	double angle_y = 0.523599; // 30 grados en radianes
 	int offset_x = 400;        // Offset en X para centrar la imagen
 	int offset_y = 300;        // Offset en Y para centrar la imagen
-	int scale = 20;            // Factor de escala unificado
+	int scale = 10;            // Factor de escala unificado
 
 	for (int i = 0; i < line_count; i++)
 	{
