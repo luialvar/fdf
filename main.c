@@ -6,7 +6,7 @@
 /*   By: luialvar <luialvar@student.42malaga.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 08:49:13 by luialvar          #+#    #+#             */
-/*   Updated: 2024/11/08 11:29:05 by luialvar         ###   ########.fr       */
+/*   Updated: 2024/11/08 12:05:10 by luialvar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int	main(int argc, char **argv)
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
 	return (0);
-}*/
+}
 
 int	main(int argc, char **argv)
 {
@@ -102,6 +102,39 @@ int	main(int argc, char **argv)
 		return (1);
 
 	img = mlx_new_image(mlx, 800, 600);
+	if (!img)
+		return (1);
+	lines = read_file_lines(argv[1], &line_count);
+        number_count = malloc(sizeof(int)*line_count);
+        if (!lines)
+                return 1;
+        matrix = make_matrix(lines, line_count, number_count);
+        if (!matrix)
+                return 1;
+	draw(img, matrix, line_count, number_count);
+	mlx_image_to_window(mlx, img, 0, 0);
+	mlx_loop(mlx);
+	mlx_terminate(mlx);
+	return (0);
+}*/
+
+int	main(int argc, char **argv)
+{
+	mlx_t			*mlx;
+	mlx_image_t		*img;
+	char                    **lines;
+        int                     line_count;
+        int                             **matrix;
+        int                     *number_count;
+	int		monitor_width;
+        int		monitor_height;
+
+	mlx = mlx_init(1, 1, "fdf", true);
+	if (!mlx)
+		return (1);
+	mlx_get_monitor_size(0, &monitor_width, &monitor_height);
+	mlx_set_window_size(mlx, monitor_width, monitor_height);
+        img = mlx_new_image(mlx, monitor_width, monitor_height);
 	if (!img)
 		return (1);
 	lines = read_file_lines(argv[1], &line_count);
