@@ -6,7 +6,7 @@
 /*   By: luialvar <luialvar@student.42malaga.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 08:49:13 by luialvar          #+#    #+#             */
-/*   Updated: 2024/11/08 12:05:10 by luialvar         ###   ########.fr       */
+/*   Updated: 2024/11/25 16:10:45 by luialvar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,3 +150,4 @@ int	main(int argc, char **argv)
 	mlx_terminate(mlx);
 	return (0);
 }
+// gcc printing.c main.c create_matrix.c src/mlx_init.c libmlx42.a -I./src -I./get_next_line external_functions.c ft_split.c get_next_line/*.c -lglfw -lGL -lm -o test

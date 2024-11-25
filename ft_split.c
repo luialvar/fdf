@@ -12,34 +12,6 @@
 
 #include "fdf.h"
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char	*sub;
-	size_t	size;
-
-	if (!s)
-		return (NULL);
-	size = ft_strlen (s);
-	if (start >= size)
-	{
-		sub = malloc (1);
-		if (!sub)
-			return (NULL);
-		sub[0] = '\0';
-		return (sub);
-	}
-	if (len + start > size)
-	{
-		len = size - start;
-	}
-	sub = (char *)malloc (len + 1);
-	if (!sub)
-		return (NULL);
-	ft_memcpy(sub, s + start, len);
-	sub[len] = '\0';
-	return (sub);
-}
-
 static int	ft_count_strings(const char*s, char c)
 {
 	size_t		i;

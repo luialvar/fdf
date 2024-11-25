@@ -6,178 +6,223 @@
 /*   By: luialvar <luialvar@student.42malaga.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 12:00:11 by luialvar          #+#    #+#             */
-/*   Updated: 2024/11/08 11:32:34 by luialvar         ###   ########.fr       */
+/*   Updated: 2024/11/10 17:42:45 by luialvar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-void	draw(mlx_image_t *img, int **matrix, int line_count, int* number_count)
+//algoritmo de Bresenham
+void draw_line(mlx_image_t *img, int x0, int y0, int x1, int y1, uint32_t color)
+{
+	// Calcula las diferencias absolutas en X e Y
+	int dx = abs(x1 - x0);
+	int dy = abs(y1 - y0);
+
+	// Determina la dirección de los pasos en X e Y
+	int sx = -1;
+	int sy = -1;
+	if (x0 < x1)
+		sx = 1;
+	if (y0 < y1)
+		sy = 1;
+
+	// Error inicial
+	int err = dx - dy;
+
+	// Dibuja la línea píxel a píxel
+	while (x0 != x1 || y0 != y1)
+	{
+		// Verifica que el punto está dentro de los límites de la imagen
+		if (x0 >= 0 && x0 < img->width && y0 >= 0 && y0 < img->height)
+			mlx_put_pixel(img, x0, y0, color);
+
+		// Calcula el doble del error para ajustar X o Y
+		int e2 = 2 * err;
+
+		// Ajusta el error y el valor de X
+		if (e2 > -dy)
+		{
+			err -= dy;
+			x0 += sx;
+		}
+
+		// Ajusta el error y el valor de Y
+		if (e2 < dx)
+		{
+			err += dx;
+			y0 += sy;
+		}
+	}
+}
+
+double determine_scale(mlx_image_t *img, int **matrix, int line_count, int* number_count)
+{
+	double angle_x = 0.523599; // 30 grados en radianes
+	double angle_y = 0.523599; // 30 grados en radianes
+	double max_min_x[2] = {0, 0};
+	double max_min_y[2] = {sin(angle_y) - matrix[0][0], sin(angle_y) - matrix[0][0]};
+	int i = 0;
+
+	while (i < line_count)
+	{
+		int stop = number_count[i];
+		int j = 0;
+
+		while (j < stop)
+		{
+			int x3D = j;
+			int y3D = i;
+			int z3D = matrix[i][j];
+
+			// Proyección isométrica
+			int x_iso = (x3D - y3D) * cos(angle_x);
+			int y_iso = (x3D + y3D) * sin(angle_y) - z3D;
+
+			if (x_iso > max_min_x[0])
+			{
+				max_min_x[0] = x_iso;
+			}
+			if (x_iso < max_min_x[1])
+			{
+				max_min_x[1] = x_iso;
+			}
+			if (y_iso > max_min_y[0])
+			{
+				max_min_y[0] = y_iso;
+			}
+			if (y_iso < max_min_y[1])
+			{
+				max_min_y[1] = y_iso;
+			}
+
+			j++;
+		}
+
+		i++;
+	}
+
+	double scale_x = img->width * 0.7 / (max_min_x[0] - max_min_x[1]);
+	double scale_y = img->height * 0.7 / (max_min_y[0] - max_min_y[1]);
+
+	if (scale_x < scale_y)
+	{
+		return scale_x;
+	}
+	else
+	{
+		return scale_y;
+	}
+}
+
+void draw(mlx_image_t *img, int **matrix, int line_count, int* number_count)
 {
 	// Limpiar la imagen antes de redibujar
 	clear_image(img);
 
 	double angle_x = 0.523599; // 30 grados en radianes
 	double angle_y = 0.523599; // 30 grados en radianes
-	int offset_x = 400;        // Offset en X para centrar la imagen
-	int offset_y = 300;        // Offset en Y para centrar la imagen
-	int scale = 10;            // Factor de escala unificado
+	double scale = determine_scale(img, matrix, line_count, number_count);
 
-	for (int i = 0; i < line_count; i++)
+	double min_x = 0;
+	double max_x = 0;
+	double min_y = 0;
+	double max_y = 0;
+	int i = 0;
+
+	while (i < line_count)
 	{
 		int stop = number_count[i];
-		for (int j = 0; j < stop; j++)
+		int j = 0;
+
+		while (j < stop)
 		{
-			// Coordenadas originales del punto en 3D
 			int x3D = j * scale;
 			int y3D = i * scale;
 			int z3D = matrix[i][j] * scale;
 
-			// Transformación isométrica
-			int x_iso = (x3D - y3D) * cos(angle_x);
-			int y_iso = (x3D + y3D) * sin(angle_y) - z3D;
+			int x_iso = (int)((x3D - y3D) * cos(angle_x));
+			int y_iso = (int)((x3D + y3D) * sin(angle_y) - z3D);
 
-			// Dibujar el punto en la proyección isométrica
-			mlx_put_pixel(img, offset_x + x_iso, offset_y + y_iso, 0xFF0000FF);
-		}
-	}
-}
-
-int**	make_matrix(char** str_arr, int rows, int* count_numbers_line) 
-{
-	int**	result;
-	int		i;
-	int 		count;
-
-	result = (int**)malloc(rows * sizeof(int*));
-	i = 0;
-	while (i < rows) 
-	{
-		char**	tokens = ft_split(str_arr[i], ' ');
-		count = 0;
-		while (tokens[count] != NULL) 
-			count++;
-		count_numbers_line[i] = count;
-		result[i] = (int*)malloc(count * sizeof(int));
-		int		j = 0;
-		char	checker = 'a';  // Inicia checker como válido
-		while (j < count) {
-			result[i][j] = ft_atoi(tokens[j], &checker);
-			if (checker == 'b') {
-				printf("Error: Invalid number or overflow detected at row %d, column %d\n", i, j);
-				return (NULL);
+			if (x_iso > max_x)
+			{
+				max_x = x_iso;
 			}
-			free(tokens[j]); // Libera cada token después de la conversión
+			if (x_iso < min_x)
+			{
+				min_x = x_iso;
+			}
+			if (y_iso > max_y)
+			{
+				max_y = y_iso;
+			}
+			if (y_iso < min_y)
+			{
+				min_y = y_iso;
+			}
+
 			j++;
 		}
-		free(tokens);
-		//free(str_arr[i]);
+
 		i++;
 	}
-	//free(str_arr);
-	return result;
-}
 
-int	count_lines(int infile)
-{
-	int		count = 0;
-	char	buffer;
-	int		has_content = 0;
-
-	// leer el archivo caracter por caracter
-	while (read(infile, &buffer, 1) > 0)
-	{
-		has_content = 1; // Indica que hay contenido en el archivo
-		if (buffer == '\n')
-			count++;
-	}
-	// Si hay contenido pero no terminó en un salto de línea, contar una línea extra
-	if (has_content && buffer != '\n')
-		count++;
-	return count;
-}
-
-char	**read_file_lines(const char *filename, int *line_count)
-{
-	int		infile;
-	char	**lines;
-	char	*current_line;
-	int		i;
-
-	infile = open(filename, O_RDONLY);
-	if (infile < 0)
-	{
-		perror("Error opening file");
-		return NULL;
-	}
-	*line_count = count_lines(infile);
-	close(infile);
-	infile = open(filename, O_RDONLY);
-	if (infile < 0)
-	{
-		perror("Error reopening file");
-		return NULL;
-	}
-	lines = malloc(sizeof(char *) * ((*line_count) + 1));
-	if (!lines)
-	{
-		perror("Error allocating memory");
-		close(infile);
-		return NULL;
-	}
+	int offset_x = (img->width - (max_x - min_x)) / 2 - min_x;
+	int offset_y = (img->height - (max_y - min_y)) / 2 - min_y;
 	i = 0;
-	current_line = get_next_line(infile);
-	while (i < (*line_count))
+
+	while (i < line_count)
 	{
-		lines[i] = current_line;
+		int stop = number_count[i];
+		int j = 0;
+
+		while (j < stop)
+		{
+			int x3D = j * scale;
+			int y3D = i * scale;
+			int z3D = matrix[i][j] * scale;
+
+			int x_iso = (int)((x3D - y3D) * cos(angle_x));
+			int y_iso = (int)((x3D + y3D) * sin(angle_y) - z3D);
+
+			int x_current = offset_x + x_iso;
+			int y_current = offset_y + y_iso;
+
+			// Dibujar la línea horizontal si hay un punto siguiente en la misma fila
+			if (j + 1 < stop)
+			{
+				int x3D_next = (j + 1) * scale;
+				int y3D_next = i * scale;
+				int z3D_next = matrix[i][j + 1] * scale;
+
+				int x_iso_next = (int)((x3D_next - y3D_next) * cos(angle_x));
+				int y_iso_next = (int)((x3D_next + y3D_next) * sin(angle_y) - z3D_next);
+
+				int x_next = offset_x + x_iso_next;
+				int y_next = offset_y + y_iso_next;
+
+				draw_line(img, x_current, y_current, x_next, y_next, 0xFF0000FF);
+			}
+
+			// Dibujar la línea vertical si hay un punto en la siguiente fila
+			if (i + 1 < line_count && j < number_count[i + 1])
+			{
+				int x3D_next = j * scale;
+				int y3D_next = (i + 1) * scale;
+				int z3D_next = matrix[i + 1][j] * scale;
+
+				int x_iso_next = (int)((x3D_next - y3D_next) * cos(angle_x));
+				int y_iso_next = (int)((x3D_next + y3D_next) * sin(angle_y) - z3D_next);
+
+				int x_next = offset_x + x_iso_next;
+				int y_next = offset_y + y_iso_next;
+
+				draw_line(img, x_current, y_current, x_next, y_next, 0xFF0000FF);
+			}
+
+			j++;
+		}
+
 		i++;
-		current_line = get_next_line(infile);
 	}
-	lines[i] = NULL;
-	close(infile);
-	return (lines);
 }
-/*
-int main(int argc, char **argv) {
-    if (argc < 2) {
-        fprintf(stderr, "Uso: %s <archivo>\n", argv[0]);
-        return 1;
-    }
-
-    char **lines;
-    int line_count;
-    int *count_numbers_line;
-    int **matrix;
-
-    // Leer el archivo y obtener el contenido en `lines`
-    lines = read_file_lines(argv[1], &line_count);
-    if (!lines) {
-        fprintf(stderr, "Error al leer el archivo\n");
-        return 1;
-    }
-
-    // Asignar memoria para el conteo de números en cada línea
-    count_numbers_line = malloc(line_count * sizeof(int));
-    // Crear la matriz a partir de las líneas leídas
-    matrix = make_matrix(lines, line_count, count_numbers_line);
-   if (!matrix) {
-        fprintf(stderr, "Error al crear la matriz\n");
-        free(count_numbers_line);
-        for (int i = 0; i < line_count; i++) {
-            free(lines[i]);
-        }
-        free(lines);
-        return 1;
-    }
-
-    // Imprimir la matriz para verificar el contenido
-    printf("Contenido de la matriz:\n");
-    for (int i = 0; i < line_count; i++) {
-        printf("Fila %d: ", i);
-        for (int j = 0; j < count_numbers_line[i]; j++) {
-            printf("%d ", matrix[i][j]);
-        }
-        printf("\n");
-    }
-    return 0;
-}*/
