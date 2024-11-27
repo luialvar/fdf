@@ -25,7 +25,7 @@ int**	make_matrix(char** str_arr, int rows, int* count_numbers_line)
 		char**	tokens = ft_split(str_arr[i], ' ');
 		count = 0;
 		while (tokens[count] != NULL) 
-			count++;
+    		count++;
 		count_numbers_line[i] = count;
 		result[i] = (int*)malloc(count * sizeof(int));
 		int		j = 0;
@@ -44,7 +44,7 @@ int**	make_matrix(char** str_arr, int rows, int* count_numbers_line)
 		i++;
 	}
 	//free(str_arr);
-	return result;
+	return (result);
 }
 
 int	count_lines(int infile)
@@ -98,6 +98,7 @@ char	**read_file_lines(const char *filename, int *line_count)
 	current_line = get_next_line(infile);
 	while (i < (*line_count))
 	{
+		clean_trailing_spaces(current_line);
 		lines[i] = current_line;
 		i++;
 		current_line = get_next_line(infile);

@@ -95,15 +95,13 @@ double determine_scale(mlx_image_t *img, int **matrix, int line_count, int* numb
 			{
 				max_min_y[1] = y_iso;
 			}
-
 			j++;
 		}
-
 		i++;
 	}
 
-	double scale_x = img->width * 0.7 / (max_min_x[0] - max_min_x[1]);
-	double scale_y = img->height * 0.7 / (max_min_y[0] - max_min_y[1]);
+	double scale_x = img->width * 0.5 / (max_min_x[0] - max_min_x[1]);
+	double scale_y = img->height * 0.5 / (max_min_y[0] - max_min_y[1]);
 
 	if (scale_x < scale_y)
 	{

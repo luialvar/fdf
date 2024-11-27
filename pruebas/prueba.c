@@ -44,7 +44,7 @@ void	draw_isometric_square(mlx_image_t *img)
 		int x2 = (points[j][0] - points[j][1]) * cos(0.523599);
 		int y2 = (points[j][0] + points[j][1]) * sin(0.523599) - points[j][2];
 		draw_line(img, 200 + x1, 200 + y1, 200 + x2, 200 + y2, 0xFF0000FF);
-	}
+	}handle_keypress(mlx_key_data_t keydata, void *param)
 }
 
 int	main(void)

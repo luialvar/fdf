@@ -23,5 +23,9 @@ mlx_t	*initialize_window(mlx_image_t **img);
 void    handle_resize(int32_t width, int32_t height, void *param);
 void    handle_keypress(mlx_key_data_t keydata, void *param);
 void    clear_image(mlx_image_t *img);
+int     is_fdf(char* name);
+void clean_trailing_spaces(char *str);
+
+
 
 #endif
